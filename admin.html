@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciyow Store Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 100px auto;
+            padding: 20px;
+        }
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .orders-table th, .orders-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        .orders-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .orders-table tr:hover {
+            background-color: rgba(27, 59, 135, 0.05);
+        }
+        .order-items {
+            margin: 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <img src="images/ciyow.png" alt="Ciyow Store" class="logo">
+            </div>
+            <h2>Admin Panel</h2>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <h1>Order Management</h1>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Shipping Address</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+                <!-- Orders will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Fetch and display orders
+        async function fetchOrders() {
+            try {
+                const response = await fetch('http://localhost:3000/api/orders');
+                const orders = await response.json();
+                displayOrders(orders);
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        }
+
+        function displayOrders(orders) {
+            const tableBody = document.getElementById('ordersTableBody');
+            tableBody.innerHTML = orders.map(order => `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${new Date(order.date).toLocaleString()}</td>
+                    <td>${order.shippingAddress.split('\n')[0]}</td>
+                    <td>
+                        <ul class="order-items">
+                            ${order.items.map(item => `
+                                <li>${item.name} (${item.quantity})</li>
+                            `).join('')}
+                        </ul>
+                    </td>
+                    <td>$${order.total.toFixed(2)}</td>
+                    <td>${order.shippingAddress.replace(/\n/g, '<br>')}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Fetch orders when page loads
+        fetchOrders();
+
+        // Refresh orders every 30 seconds
+        setInterval(fetchOrders, 30000);
+    </script>
+</body>
+</html> 

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciyow Store</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <img src="images/ciyow.png" alt="Ciyow Store" class="logo">
+            </div>
+            <div class="nav-actions">
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn-login" onclick="openModal('loginModal')">Login</button>
+                    <button class="btn-signup" onclick="openModal('signupModal')">Sign Up</button>
+                </div>
+                <div class="user-menu hidden" id="userMenu">
+                    <span class="username" id="currentUser"></span>
+                    <button class="btn-orders" onclick="showOrders()">My Orders</button>
+                    <button class="btn-logout" onclick="logout()">Logout</button>
+                </div>
+                <div class="cart-icon" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Modals -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Login</h2>
+            <form id="loginForm" onsubmit="login(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn-submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signupModal')">&times;</span>
+            <h2>Sign Up</h2>
+            <form id="signupForm" onsubmit="signup(event)">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required minlength="6">
+                </div>
+                <button type="submit" class="btn-submit">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <span class="close" onclick="toggleCart()">&times;</span>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be inserted here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">$0.00</span>
+            </div>
+            <button class="btn-checkout" onclick="checkout()">Checkout</button>
+        </div>
+    </div>
+
+    <!-- Orders Modal -->
+    <div class="modal" id="ordersModal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeModal('ordersModal')">&times;</span>
+            <h2>Order History</h2>
+            <div class="orders-list" id="ordersList">
+                <!-- Orders will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeModal('checkoutModal')">&times;</span>
+            <h2>Checkout</h2>
+            <form id="checkoutForm" onsubmit="placeOrder(event)">
+                <div class="form-group">
+                    <label for="shippingAddress">Shipping Address</label>
+                    <textarea id="shippingAddress" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="cardNumber">Card Number</label>
+                    <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cardExpiry">Expiry Date</label>
+                        <input type="text" id="cardExpiry" placeholder="MM/YY" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cardCVV">CVV</label>
+                        <input type="text" id="cardCVV" placeholder="123" required>
+                    </div>
+                </div>
+                <div class="order-summary">
+                    <h3>Order Summary</h3>
+                    <div id="checkoutItems"></div>
+                    <div class="checkout-total">
+                        <span>Total:</span>
+                        <span id="checkoutTotal">$0.00</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>The future of shopping is here</h1>
+            <p>Discover our curated collection of premium products designed for modern living.</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="featured-section">
+            <div class="container">
+                <h2>Our Products</h2>
+                <div class="products-grid" id="products-container">
+                    <!-- Products will be dynamically inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Details Modal -->
+        <div class="modal" id="productModal">
+            <div class="modal-content modal-large">
+                <span class="close" onclick="closeModal('productModal')">&times;</span>
+                <div class="product-details" id="productDetails">
+                    <!-- Product details will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <section class="benefits-section">
+            <div class="container">
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <i class="fas fa-truck"></i>
+                        <h3>Fast Delivery</h3>
+                        <p>Free shipping on orders over $100</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Secure Shopping</h3>
+                        <p>Protected by industry-leading security</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-undo"></i>
+                        <h3>Easy Returns</h3>
+                        <p>30-day hassle-free returns</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>CiyowStore</h3>
+                    <p>The future of shopping</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Shipping Policy</a></li>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="https://facebook.com" target="_blank"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i> Instagram</a></li>
+                        <li><a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i> Twitter</a></li>
+                        <li><a href="tel:+1234567890"><i class="fas fa-phone"></i> +1 234 567 890</a></li>
+                        <li><a href="mailto:info@ciyowstore.com"><i class="fas fa-envelope"></i> info@ciyowstore.com</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="products.js"></script>
+    <script src="auth.js"></script>
+    <script src="cart.js"></script>
+    <script src="orders.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 
